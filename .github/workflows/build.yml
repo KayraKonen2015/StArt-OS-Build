@@ -1,21 +1,35 @@
-name: StArt OS Android 10 Builder
+name: StArt OS Android 10 GSI Builder
 
 on:
-  workflow_dispatch: # Bu satır sayesinde "Başlat" butonuna biz basacağız
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # Android 10 için en stabil sürüm
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Depolama Alanı Aç (Mavi Ekran Önlemi)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
 
-      - name: Sistem Hazırlığı
+      - name: Gerekli Araçları Kur
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential zip curl libc6-dev libncurses5-dev
+          sudo apt-get install -y openjdk-8-jdk python3 git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip
 
-      - name: StArt OS Bilgilendirme
+      - name: Repo Aracını Kur
         run: |
-          echo "StArt OS (Android 10) derleme işlemi için hazırlıklar tamam."
-          echo "Hedef: Keskin kare ikonlar ve Türkçe Q/F klavye desteği."
+          mkdir ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          sudo ln -sf ~/bin/repo /usr/bin/repo
+
+      - name: StArt OS Kodlarını İndir (LineageOS 17.1)
+        run: |
+          git config --global user.email "kayra@startos.com"
+          git config --global user.name "Kayra"
+          mkdir startos
+          cd startos
+          repo init -u https://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags

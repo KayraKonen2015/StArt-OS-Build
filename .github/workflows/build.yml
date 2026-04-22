@@ -1,0 +1,21 @@
+name: StArt OS Android 10 Builder
+
+on:
+  workflow_dispatch: # Bu satır sayesinde "Başlat" butonuna biz basacağız
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Sistem Hazırlığı
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc build-essential zip curl libc6-dev libncurses5-dev
+
+      - name: StArt OS Bilgilendirme
+        run: |
+          echo "StArt OS (Android 10) derleme işlemi için hazırlıklar tamam."
+          echo "Hedef: Keskin kare ikonlar ve Türkçe Q/F klavye desteği."

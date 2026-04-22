@@ -5,18 +5,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04 # Android 10 için en stabil sürüm
+    runs-on: ubuntu-20.04
     steps:
-      - name: Depolama Alanı Aç (Mavi Ekran Önlemi)
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Depolama Alanı Aç
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
+          docker rmi $(docker images -q)
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /usr/local/lib/android
+          sudo apt-get clean
 
       - name: Gerekli Araçları Kur
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-8-jdk python3 git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip
+          sudo apt-get install -y bc build-essential zip curl libc6-dev libncurses5-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev g++-multilib gcc-multilib lib32ncurses5-dev lib32readline-dev lib32z1-dev python3
 
       - name: Repo Aracını Kur
         run: |
@@ -25,11 +28,11 @@ jobs:
           chmod a+x ~/bin/repo
           sudo ln -sf ~/bin/repo /usr/bin/repo
 
-      - name: StArt OS Kodlarını İndir (LineageOS 17.1)
+      - name: StArt OS Kodlarını İndir
         run: |
-          git config --global user.email "kayra@startos.com"
-          git config --global user.name "Kayra"
           mkdir startos
           cd startos
+          git config --global user.name "KayraKonen2015"
+          git config --global user.email "kayra@example.com"
           repo init -u https://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
